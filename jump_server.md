@@ -10,16 +10,85 @@ layout: "learningpathall"
 
 ## Deploy Arm instances on GCP and provide access via Jump Server
 
-## Prerequisites
-* A Google cloud account
-* [Google Cloud CLI](https://cloud.google.com/sdk/docs/install-sdk#deb)
-* [Terraform](https://www.terraform.io/cli/install/apt)
+## Before you begin
+
+Any computer which has the required tools installed can be used for this section. 
+
+You will need a [Google Cloud account](https://console.cloud.google.com/). Create an account if needed. 
+
+Three tools are required on the computer you are using. Follow the links to install the required tools.
+* [Terraform](/install-tools/terraform)
+* [Google Cloud CLI](/install-tools/gcloud)
 
 ## Introduction to Jump Server
 A Jump Server (also known as bastion host) is an intermediary device responsible for funnelling traffic through firewalls using a supervised secure channel. By creating a barrier between networks, jump servers create an added layer of security against outsiders wanting to maliciously access sensitive company data. Only those with the right credentials can log into a jump server and obtain authorization to proceed to a different security zone.
 
-## Deploying Arm instances on AWS and providing access via Jump Server
-For deploying Arm instances on AWS and providing access via Jump Server, the Terraform configuration is broken into 7 files: ec2.tf, outputs.tf, provider.tf, security_groups.tf, ssh_key_gen.tf, variables.tf and VPC_subnet_IG_RT.tf
+## Generate key-pair(public key, private key) using ssh keygen
+
+Before using Terraform, first generate the key-pair (public key, private key) using `ssh-keygen`. To generate the key-pair, follow this [documentation](/learning-paths/server-and-cloud/aws/terraform#generate-key-pairpublic-key-private-key-using-ssh-keygen).
+
+## Deploying Arm instances on GCP and providing access via Jump Server
+For deploying Arm instances on GCP and providing access via Jump Server, the Terraform configuration is broken into 7 files: ec2.tf, outputs.tf, provider.tf, security_groups.tf, ssh_key_gen.tf, variables.tf and VPC_subnet_IG_RT.tf
+
+
+**main.tf** creates an instance with OS Login configured to use as a bastion host and a private instance to use alongside the bastion host.
+```console
+terraform {
+  required_version = ">= 0.12.26"
+}
+
+# Create a Management Network for shared services
+module "management_network" {
+  source = "./modules/vpc-network"
+  project     = var.project
+  region      = var.region
+}
+
+# Create an instance with OS Login configured to use as a bastion host
+resource "google_compute_instance" "bastion_host" {
+  project      = var.project
+  name         = "bastion-vm"
+  machine_type = "t2a-standard-1"
+  zone         = var.zone
+  tags = ["public"]
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-2204-lts-arm64"
+    }
+  }
+  network_interface {
+    subnetwork = module.management_network.public_subnetwork
+    // If var.static_ip is set use that IP, otherwise this will generate an ephemeral IP
+    access_config {
+      nat_ip = var.static_ip
+    }
+  }
+  metadata = {
+    enable-oslogin = "TRUE"
+  }
+}
+# Create a private instance to use alongside the bastion host.
+resource "google_compute_instance" "private" {
+  project = var.project
+  name         = "bastion-private"
+  machine_type = "t2a-standard-1"
+  zone         = var.zone
+  allow_stopping_for_update = true
+  tags = ["private"]
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-2204-lts-arm64"
+    }
+  }
+  network_interface {
+    subnetwork = module.management_network.private_subnetwork
+  }
+  metadata = {
+    enable-oslogin = "TRUE"
+  }
+}
+```
+
 
 **ssh_key_gen.tf** creates a private key (id_rsa) and public key (id_rsa.pub) and saves the it in `~/.ssh/` path. It is necessary to save the key in order to SSH into Bastion Host at a later time.
 ```console
@@ -319,28 +388,8 @@ output "bastionhost-public-ip" {
 }
 ```
 
-## Terraform commands
-    
-### Initialize Terraform
-Run `terraform init` to initialize the Terraform deployment. This command is responsible for downloading all the dependencies which are required for the provider AWS.
-```console
-  terraform init
-```
-
-![tf init](https://user-images.githubusercontent.com/71631645/203960502-a22b68bb-c1d2-49bf-bb7c-5eee5ac6944c.jpg)
-
-### Create a Terraform execution plan
-Run `terraform plan` to create an execution plan.
-```console
-  terraform plan
-```
-
-### Apply a Terraform execution plan
-Run `terraform apply` to apply the execution plan to your cloud infrastructure. Below command creates all required infrastructure.
-```console
-  terraform apply
-```      
-   ![tf apply](https://user-images.githubusercontent.com/71631645/203950999-94167eaa-6f22-45f5-9647-ef2d131e9daa.jpg)
+### Terraform Commands
+To deploy the instances, we need to initialize Terraform, generate an execution plan and apply the execution plan to our cloud infrastructure. Follow this [documentation](/content/learning-paths/server-and-cloud/gcp/terraform.md#terraform-commands) to deploy the **main.tf** file.
 
 ### Verify the Instance and Bastion Host setup
 In the Google Cloud console, go to the [VM instances page](https://console.cloud.google.com/compute/instances?_ga=2.159262650.1220602700.1668410849-523068185.1662463135). The instances we created through Terraform must be displayed in the screen.
