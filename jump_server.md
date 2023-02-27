@@ -20,14 +20,14 @@ Three tools are required on the computer you are using. Follow the links to inst
 
 ## Deploy Arm instances on GCP and provide access via Jump Server
 
-## Introduction to Jump Server
+### Introduction to Jump Server
 A Jump Server (also known as bastion host) is an intermediary device responsible for funnelling traffic through firewalls using a supervised secure channel. By creating a barrier between networks, jump servers create an added layer of security against outsiders wanting to maliciously access sensitive company data. Only those with the right credentials can log into a jump server and obtain authorization to proceed to a different security zone.
 
-## Generate key-pair(public key, private key) using ssh keygen
+### Generate key-pair(public key, private key) using ssh keygen
 
 Before using Terraform, first generate the key-pair (public key, private key) using `ssh-keygen`. To generate the key-pair, follow this [documentation](/learning-paths/server-and-cloud/aws/terraform#generate-key-pairpublic-key-private-key-using-ssh-keygen).
 
-## Deploying Arm instances on GCP and providing access via Jump Server
+### Deploying Arm instances on GCP and providing access via Jump Server
 For deploying Arm instances on GCP and providing access via Jump Server, the Terraform configuration is broken into 4 files: main.tf, outputs.tf, variables.tf, and terraform.tfvars. The created a module directory for creating vpc network and firewall rules.
 
 **main.tf** creates an instance with OS Login configured to use as a bastion host and a private instance to use alongside the bastion host.
