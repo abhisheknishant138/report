@@ -28,7 +28,7 @@ A Jump Server (also known as bastion host) is an intermediary device responsible
 Before using Terraform, first generate the key-pair (public key, private key) using `ssh-keygen`. To generate the key-pair, follow this [documentation](/learning-paths/server-and-cloud/aws/terraform#generate-key-pairpublic-key-private-key-using-ssh-keygen).
 
 ### Deploying Arm instances on GCP and providing access via Jump Server
-For deploying Arm instances on GCP and providing access via Jump Server, the Terraform configuration is broken into 4 files: main.tf, outputs.tf, variables.tf, and terraform.tfvars. The created a module directory for creating vpc network and firewall rules.
+For deploying Arm instances on GCP and providing access via Jump Server, the Terraform configuration is broken into 4 files: main.tf, outputs.tf, variables.tf, and terraform.tfvars and a module directory for which contains code for creating vpc network and firewall rules.
 
 **main.tf** creates an instance with OS Login configured to use as a bastion host and a private instance to use alongside the bastion host.
 ```console
