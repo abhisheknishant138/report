@@ -43,6 +43,13 @@ module "management_network" {
   region      = var.region
 }
 
+# Add public key to IAM user
+data "google_client_openid_userinfo" "me" {}
+resource "google_os_login_ssh_public_key" "cache" {
+  user = data.google_client_openid_userinfo.me.email
+  key  = file("path/to/id_rsa.pub")
+}
+
 # Create an instance with OS Login configured to use as a bastion host
 resource "google_compute_instance" "bastion_host" {
   project      = var.project
