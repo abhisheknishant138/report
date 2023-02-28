@@ -277,19 +277,19 @@ variable "cidr_subnetwork_spacing" {
 }
 
 variable "secondary_cidr_block" {
-  description = "The IP address range of the VPC's secondary address range in CIDR notation. A prefix of /16 is recommended. Do not use a prefix higher than /27."
+  description = "The IP address range of the VPC's secondary address range in CIDR notation. A prefix of /16 is recommended."
   type        = string
   default     = "10.1.0.0/16"
 }
 
 variable "public_services_secondary_cidr_block" {
-  description = "The IP address range of the VPC's public services secondary address range in CIDR notation. A prefix of /16 is recommended. Do not use a prefix higher than /27."
+  description = "The IP address range of the VPC's public services secondary address range in CIDR notation. A prefix of /16 is recommended."
   type        = string
   default     = null
 }
 
 variable "private_services_secondary_cidr_block" {
-  description = "The IP address range of the VPC's private services secondary address range in CIDR notation. A prefix of /16 is recommended. Do not use a prefix higher than /27."
+  description = "The IP address range of the VPC's private services secondary address range in CIDR notation. A prefix of /16 is recommended."
   type        = string
   default     = null
 }
