@@ -283,13 +283,13 @@ variable "secondary_cidr_block" {
 }
 
 variable "public_services_secondary_cidr_block" {
-  description = "The IP address range of the VPC's public services secondary address range in CIDR notation. A prefix of /16 is recommended."
+  description = "The IP address range of the VPC's public services secondary address range in CIDR notation."
   type        = string
   default     = null
 }
 
 variable "private_services_secondary_cidr_block" {
-  description = "The IP address range of the VPC's private services secondary address range in CIDR notation. A prefix of /16 is recommended."
+  description = "The IP address range of the VPC's private services secondary address range in CIDR notation."
   type        = string
   default     = null
 }
