@@ -46,8 +46,16 @@ module "management_network" {
 # Add public key to IAM user
 data "google_client_openid_userinfo" "me" {}
 resource "google_os_login_ssh_public_key" "cache" {
+  project = var.project
   user = data.google_client_openid_userinfo.me.email
   key  = file("path/to/id_rsa.pub")
+}
+
+# Ensure IAM user is allowed to use OS Login
+resource "google_project_iam_member" "project" {
+  project = var.project
+  role    = "roles/compute.osAdminLogin"
+  member  = "user:${data.google_client_openid_userinfo.me.email}"
 }
 
 # Create an instance with OS Login configured to use as a bastion host
